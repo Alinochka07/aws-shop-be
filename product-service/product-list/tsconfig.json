@@ -12,7 +12,6 @@
     "rootDir": "./",
     "resolveJsonModule": true,
     "strict": true,
-    "skipLibCheck": true
   },
   "include": ["src/**/*.ts", "serverless.ts"],
   "exclude": [

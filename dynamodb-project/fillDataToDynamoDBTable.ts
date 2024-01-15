@@ -5,9 +5,7 @@ import * as dotenv from "dotenv";
 
 dotenv.config();
 
-// JS SDK v3 does not support global configuration.
-// Codemod has attempted to pass values to each service client in this file.
-// You may need to update clients outside of this file, if they use global config.
+
 AWS.config.update({
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
