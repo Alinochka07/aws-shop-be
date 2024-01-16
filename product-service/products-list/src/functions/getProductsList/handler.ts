@@ -62,33 +62,3 @@ export const getProductsList: APIGatewayProxyHandler = async (event) => {
     throw error;
   }
 };
-
-
-// export const getProductsList: APIGatewayProxyHandler = async (event) => {
-//   try {
-//     const params: DynamoDB.DocumentClient.ScanInput = {
-//       TableName: "Products_DynamoDB",
-//     };
-//     const dynamoDBResponse = await dynamoDB.scan(params).promise();
-
-//     const products: Product[] = dynamoDBResponse.Items
-//       ? dynamoDBResponse.Items.map((item) => ({
-//           id: item.id,
-//           title: item.title,
-//           price: item.price,
-//           description: item.description,
-//         }))
-//       : [];
-
-//     const response = formatJSONResponse(products, 200, {
-//       "Access-Control-Allow-Headers": "Content-Type",
-//       "Access-Control-Allow-Origin": "*",
-//       "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
-//     });
-//     console.log("Event:", JSON.stringify(event, null, 2));
-//     return response;
-//   } catch (error) {
-//     console.error("Error:", error);
-//     throw error;
-//   }
-// };

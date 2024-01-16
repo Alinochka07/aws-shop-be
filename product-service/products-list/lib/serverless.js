@@ -36,6 +36,20 @@ const serverlessConfiguration = {
                 },
             ],
         },
+        createProduct: {
+            handler: "./src/functions/createProduct/index.createProduct",
+            events: [
+                {
+                    http: {
+                        path: "products",
+                        method: "post",
+                        cors: {
+                            origin: "*",
+                        },
+                    },
+                },
+            ],
+        },
     },
 };
 module.exports = serverlessConfiguration;

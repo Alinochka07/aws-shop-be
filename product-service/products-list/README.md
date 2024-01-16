@@ -1,3 +1,9 @@
+# Links
+  GET - https://y0vl5d9de6.execute-api.eu-west-1.amazonaws.com/dev/products
+  GET - https://y0vl5d9de6.execute-api.eu-west-1.amazonaws.com/dev/products/{productId}
+  POST - https://y0vl5d9de6.execute-api.eu-west-1.amazonaws.com/dev/products
+
+
 # Serverless - AWS Node.js Typescript
 
 This project has been generated using the `aws-nodejs-typescript` template from the [Serverless framework](https://www.serverless.com/).
