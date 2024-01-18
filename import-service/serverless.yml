@@ -1,0 +1,39 @@
+service: task5bucket
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: dev
+  profile: administrator
+  region: eu-west-1
+
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+          - "s3:ListBucket"
+          - "s3:*"
+          Resource:
+            - "arn:aws:s3:::task5bucket"
+            - "arn:aws:s3:::task5bucket/*"  
+
+functions:
+  importProductsFile:
+    handler: handler.importProductsFile
+    events:
+      - http:
+          method: get
+          path: /import
+          cors: true
+          request: 
+            parameters:
+              querystrings:
+                name: true 
+      - s3: 
+          bucket: task5bucket
+          event: s3:ObjectCreated:*
+          rules: 
+            - prefix: uploaded/
+          existing: true
+  

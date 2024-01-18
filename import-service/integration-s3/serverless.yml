@@ -1,0 +1,39 @@
+service: nodeinawss3
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: dev
+  profile: administrator
+  region: eu-west-1
+
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+          - "s3:ListBucket"
+          - "s3:*"
+          Resource:
+            - "arn:aws:s3:::nodeinawss3"
+            - "arn:aws:s3:::nodeinawss3/*"  
+
+functions:
+  thumbnailsList:
+    handler: handler.thumbnailsList
+    events:
+      - http:
+          method: get
+          path: /thumbnails
+  imageUpload:
+    handler: handler.imageUpload
+    events:
+      - s3: 
+          bucket: nodeinawss3
+          event: s3:ObjectCreated:*
+          rules: 
+            - prefix: images/
+          existing: true
+      # - http: 
+      #     method: post
+      #     path: 
