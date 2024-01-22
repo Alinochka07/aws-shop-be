@@ -1,4 +1,4 @@
-service: task5bucket
+service: importproduct
 
 provider:
   name: aws
@@ -12,28 +12,38 @@ provider:
       statements:
         - Effect: "Allow"
           Action:
-          - "s3:ListBucket"
-          - "s3:*"
+            - "s3:GetObject"
+            - "s3:ListBucket"
+            - "s3:*"
+            - "s3:PutObject"
+            - "s3:PutObjectAcl"
           Resource:
-            - "arn:aws:s3:::task5bucket"
-            - "arn:aws:s3:::task5bucket/*"  
+            - "arn:aws:s3:::importproduct"
+            - "arn:aws:s3:::importproduct/*"
 
 functions:
   importProductsFile:
     handler: handler.importProductsFile
     events:
       - http:
-          method: get
           path: /import
-          cors: true
+          method: get
           request: 
             parameters:
               querystrings:
                 name: true 
-      - s3: 
-          bucket: task5bucket
+     
+  importFileParser:
+    handler: handler.importFileParser
+    events:
+      - s3:
+          bucket: importproduct
           event: s3:ObjectCreated:*
-          rules: 
-            - prefix: uploaded/
+          rules:
+            - suffix: .csv
           existing: true
-  
+          
+          
+          
+          
+          

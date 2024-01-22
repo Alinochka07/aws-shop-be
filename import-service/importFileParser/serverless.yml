@@ -1,0 +1,24 @@
+# service: importproduct
+
+# provider:
+#   name: aws
+#   runtime: nodejs18.x
+#   stage: dev
+#   profile: administrator
+#   region: eu-west-1
+
+#   iam:
+#     role:
+#       statements:
+#         - Effect: "Allow"
+#           Action:
+#             - "s3:ListBucket"
+#             - "s3:*"
+#           Resource:
+#             - "arn:aws:s3:::importproduct"
+#             - "arn:aws:s3:::importproduct/*"
+
+
+          
+          
+          

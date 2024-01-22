@@ -1,8 +1,8 @@
 {
   "service": {
-    "service": "task5bucket",
+    "service": "importproduct",
     "serviceObject": {
-      "name": "task5bucket"
+      "name": "importproduct"
     },
     "provider": {
       "name": "aws",
@@ -16,12 +16,15 @@
             {
               "Effect": "Allow",
               "Action": [
+                "s3:GetObject",
                 "s3:ListBucket",
-                "s3:*"
+                "s3:*",
+                "s3:PutObject",
+                "s3:PutObjectAcl"
               ],
               "Resource": [
-                "arn:aws:s3:::task5bucket",
-                "arn:aws:s3:::task5bucket/*"
+                "arn:aws:s3:::importproduct",
+                "arn:aws:s3:::importproduct/*"
               ]
             }
           ]
@@ -104,7 +107,13 @@
           "ImportProductsFileLogGroup": {
             "Type": "AWS::Logs::LogGroup",
             "Properties": {
-              "LogGroupName": "/aws/lambda/task5bucket-dev-importProductsFile"
+              "LogGroupName": "/aws/lambda/importproduct-dev-importProductsFile"
+            }
+          },
+          "ImportFileParserLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/importproduct-dev-importFileParser"
             }
           },
           "IamRoleLambdaExecution": {
@@ -132,7 +141,7 @@
                     "Fn::Join": [
                       "-",
                       [
-                        "task5bucket",
+                        "importproduct",
                         "dev",
                         "lambda"
                       ]
@@ -150,7 +159,7 @@
                         ],
                         "Resource": [
                           {
-                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/task5bucket-dev*:*"
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/importproduct-dev*:*"
                           }
                         ]
                       },
@@ -161,7 +170,7 @@
                         ],
                         "Resource": [
                           {
-                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/task5bucket-dev*:*:*"
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/importproduct-dev*:*:*"
                           }
                         ]
                       },
@@ -177,7 +186,7 @@
                 "Fn::Join": [
                   "-",
                   [
-                    "task5bucket",
+                    "importproduct",
                     "dev",
                     {
                       "Ref": "AWS::Region"
@@ -195,11 +204,11 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/task5bucket/dev/1705488781231-2024-01-17T10:53:01.231Z/task5bucket.zip"
+                "S3Key": "serverless/importproduct/dev/1705923978670-2024-01-22T11:46:18.670Z/importproduct.zip"
               },
               "Handler": "handler.importProductsFile",
               "Runtime": "nodejs18.x",
-              "FunctionName": "task5bucket-dev-importProductsFile",
+              "FunctionName": "importproduct-dev-importProductsFile",
               "MemorySize": 1024,
               "Timeout": 6,
               "Role": {
@@ -213,21 +222,56 @@
               "ImportProductsFileLogGroup"
             ]
           },
-          "ImportProductsFileLambdaVersionaSWzHz6JqocVzjvzVgzRQZpYpGNxdkNha6emt44l44": {
+          "ImportFileParserLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/importproduct/dev/1705923978670-2024-01-22T11:46:18.670Z/importproduct.zip"
+              },
+              "Handler": "handler.importFileParser",
+              "Runtime": "nodejs18.x",
+              "FunctionName": "importproduct-dev-importFileParser",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "ImportFileParserLogGroup"
+            ]
+          },
+          "ImportProductsFileLambdaVersionKKbX01BvSmjfMzpJzUnpt9ptqy8J4Spm1EpkZRT6GVw": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "ImportProductsFileLambdaFunction"
               },
-              "CodeSha256": "fWqIl0syrCsF5l2dkz6BI8/endfpny2a0oH/ZRIcyC0="
+              "CodeSha256": "7J8iADjOvoCc/Llnz4j098jWg2dy8sgbPbN0raOTVRg="
             }
           },
-          "ImportProductsFileCustomS31": {
+          "ImportFileParserLambdaVersionWrhvIbu6IKVHCIploWOGcYqxMZAAK8jc1w6d61R8Iw": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "ImportFileParserLambdaFunction"
+              },
+              "CodeSha256": "7J8iADjOvoCc/Llnz4j098jWg2dy8sgbPbN0raOTVRg="
+            }
+          },
+          "ImportFileParserCustomS31": {
             "Type": "Custom::S3",
             "Version": 1,
             "DependsOn": [
-              "ImportProductsFileLambdaFunction",
+              "ImportFileParserLambdaFunction",
               "CustomDashresourceDashexistingDashs3LambdaFunction"
             ],
             "Properties": {
@@ -237,14 +281,14 @@
                   "Arn"
                 ]
               },
-              "FunctionName": "task5bucket-dev-importProductsFile",
-              "BucketName": "task5bucket",
+              "FunctionName": "importproduct-dev-importFileParser",
+              "BucketName": "importproduct",
               "BucketConfigs": [
                 {
                   "Event": "s3:ObjectCreated:*",
                   "Rules": [
                     {
-                      "Prefix": "uploaded/"
+                      "Suffix": ".csv"
                     }
                   ]
                 }
@@ -277,7 +321,7 @@
                       "-",
                       [
                         "dev",
-                        "task5bucket",
+                        "importproduct",
                         "custom-resources-lambda"
                       ]
                     ]
@@ -298,7 +342,7 @@
                               "s3",
                               "",
                               "",
-                              "task5bucket"
+                              "importproduct"
                             ]
                           ]
                         },
@@ -347,9 +391,9 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/task5bucket/dev/1705488781231-2024-01-17T10:53:01.231Z/custom-resources.zip"
+                "S3Key": "serverless/importproduct/dev/1705923978670-2024-01-22T11:46:18.670Z/custom-resources.zip"
               },
-              "FunctionName": "task5bucket-dev-custom-resource-existing-s3",
+              "FunctionName": "importproduct-dev-custom-resource-existing-s3",
               "Handler": "s3/handler.handler",
               "MemorySize": 1024,
               "Runtime": "nodejs16.x",
@@ -368,7 +412,7 @@
           "ApiGatewayRestApi": {
             "Type": "AWS::ApiGateway::RestApi",
             "Properties": {
-              "Name": "dev-task5bucket",
+              "Name": "dev-importproduct",
               "EndpointConfiguration": {
                 "Types": [
                   "EDGE"
@@ -387,51 +431,6 @@
                 ]
               },
               "PathPart": "import",
-              "RestApiId": {
-                "Ref": "ApiGatewayRestApi"
-              }
-            }
-          },
-          "ApiGatewayMethodImportOptions": {
-            "Type": "AWS::ApiGateway::Method",
-            "Properties": {
-              "AuthorizationType": "NONE",
-              "HttpMethod": "OPTIONS",
-              "MethodResponses": [
-                {
-                  "StatusCode": "200",
-                  "ResponseParameters": {
-                    "method.response.header.Access-Control-Allow-Origin": true,
-                    "method.response.header.Access-Control-Allow-Headers": true,
-                    "method.response.header.Access-Control-Allow-Methods": true
-                  },
-                  "ResponseModels": {}
-                }
-              ],
-              "RequestParameters": {},
-              "Integration": {
-                "Type": "MOCK",
-                "RequestTemplates": {
-                  "application/json": "{statusCode:200}"
-                },
-                "ContentHandling": "CONVERT_TO_TEXT",
-                "IntegrationResponses": [
-                  {
-                    "StatusCode": "200",
-                    "ResponseParameters": {
-                      "method.response.header.Access-Control-Allow-Origin": "'*'",
-                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Amzn-Trace-Id'",
-                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET'"
-                    },
-                    "ResponseTemplates": {
-                      "application/json": ""
-                    }
-                  }
-                ]
-              },
-              "ResourceId": {
-                "Ref": "ApiGatewayResourceImport"
-              },
               "RestApiId": {
                 "Ref": "ApiGatewayRestApi"
               }
@@ -481,14 +480,14 @@
               },
               "MethodResponses": [],
               "RequestValidatorId": {
-                "Ref": "ApiGatewayTask5bucketRequestValidator"
+                "Ref": "ApiGatewayImportproductRequestValidator"
               }
             },
             "DependsOn": [
               "ImportProductsFileLambdaPermissionApiGateway"
             ]
           },
-          "ApiGatewayTask5bucketRequestValidator": {
+          "ApiGatewayImportproductRequestValidator": {
             "Type": "AWS::ApiGateway::RequestValidator",
             "Properties": {
               "RestApiId": {
@@ -496,10 +495,10 @@
               },
               "ValidateRequestBody": true,
               "ValidateRequestParameters": true,
-              "Name": "task5bucket-dev | Validate request body and querystring parameters"
+              "Name": "importproduct-dev | Validate request body and querystring parameters"
             }
           },
-          "ApiGatewayDeployment1705488773488": {
+          "ApiGatewayDeployment1705923965983": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -508,7 +507,6 @@
               "StageName": "dev"
             },
             "DependsOn": [
-              "ApiGatewayMethodImportOptions",
               "ApiGatewayMethodImportGet"
             ]
           },
@@ -556,16 +554,25 @@
               "Ref": "ServerlessDeploymentBucket"
             },
             "Export": {
-              "Name": "sls-task5bucket-dev-ServerlessDeploymentBucketName"
+              "Name": "sls-importproduct-dev-ServerlessDeploymentBucketName"
             }
           },
           "ImportProductsFileLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "ImportProductsFileLambdaVersionaSWzHz6JqocVzjvzVgzRQZpYpGNxdkNha6emt44l44"
+              "Ref": "ImportProductsFileLambdaVersionKKbX01BvSmjfMzpJzUnpt9ptqy8J4Spm1EpkZRT6GVw"
             },
             "Export": {
-              "Name": "sls-task5bucket-dev-ImportProductsFileLambdaFunctionQualifiedArn"
+              "Name": "sls-importproduct-dev-ImportProductsFileLambdaFunctionQualifiedArn"
+            }
+          },
+          "ImportFileParserLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "ImportFileParserLambdaVersionWrhvIbu6IKVHCIploWOGcYqxMZAAK8jc1w6d61R8Iw"
+            },
+            "Export": {
+              "Name": "sls-importproduct-dev-ImportFileParserLambdaFunctionQualifiedArn"
             }
           },
           "ServiceEndpoint": {
@@ -591,7 +598,7 @@
               ]
             },
             "Export": {
-              "Name": "sls-task5bucket-dev-ServiceEndpoint"
+              "Name": "sls-importproduct-dev-ServiceEndpoint"
             }
           }
         }
@@ -687,25 +694,8 @@
         "events": [
           {
             "http": {
-              "method": "get",
               "path": "import",
-              "cors": {
-                "origin": "*",
-                "methods": [
-                  "OPTIONS",
-                  "GET"
-                ],
-                "headers": [
-                  "Content-Type",
-                  "X-Amz-Date",
-                  "Authorization",
-                  "X-Api-Key",
-                  "X-Amz-Security-Token",
-                  "X-Amz-User-Agent",
-                  "X-Amzn-Trace-Id"
-                ],
-                "allowCredentials": false
-              },
+              "method": "get",
               "request": {
                 "parameters": {
                   "method.request.querystring.name": true
@@ -713,33 +703,45 @@
               },
               "integration": "AWS_PROXY"
             }
-          },
+          }
+        ],
+        "name": "importproduct-dev-importProductsFile",
+        "package": {},
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "nodejs18.x",
+        "vpc": {},
+        "versionLogicalId": "ImportProductsFileLambdaVersionKKbX01BvSmjfMzpJzUnpt9ptqy8J4Spm1EpkZRT6GVw"
+      },
+      "importFileParser": {
+        "handler": "handler.importFileParser",
+        "events": [
           {
             "s3": {
-              "bucket": "task5bucket",
+              "bucket": "importproduct",
               "event": "s3:ObjectCreated:*",
               "rules": [
                 {
-                  "prefix": "uploaded/"
+                  "suffix": ".csv"
                 }
               ],
               "existing": true
             }
           }
         ],
-        "name": "task5bucket-dev-importProductsFile",
+        "name": "importproduct-dev-importFileParser",
         "package": {},
         "memory": 1024,
         "timeout": 6,
         "runtime": "nodejs18.x",
         "vpc": {},
-        "versionLogicalId": "ImportProductsFileLambdaVersionaSWzHz6JqocVzjvzVgzRQZpYpGNxdkNha6emt44l44"
+        "versionLogicalId": "ImportFileParserLambdaVersionWrhvIbu6IKVHCIploWOGcYqxMZAAK8jc1w6d61R8Iw"
       }
     },
     "configValidationMode": "warn",
     "serviceFilename": "serverless.yml",
     "initialServerlessConfig": {
-      "service": "task5bucket",
+      "service": "importproduct",
       "provider": {
         "$ref": "$[\"service\"][\"provider\"]"
       },
@@ -749,10 +751,10 @@
     },
     "layers": {},
     "isDashboardMonitoringPreconfigured": false,
-    "artifact": "/Users/alina/Documents/PROGRAMMING/Frontend/RS/aws-shop-be/import-service/.serverless/task5bucket.zip"
+    "artifact": "/Users/alina/Documents/PROGRAMMING/Frontend/RS/aws-shop-be/import-service/.serverless/importproduct.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/task5bucket/dev/1705488781231-2024-01-17T10:53:01.231Z",
-    "artifact": "task5bucket.zip"
+    "artifactDirectoryName": "serverless/importproduct/dev/1705923978670-2024-01-22T11:46:18.670Z",
+    "artifact": "importproduct.zip"
   }
 }
